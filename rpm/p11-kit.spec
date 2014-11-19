@@ -6,7 +6,7 @@ Summary:        Library for loading and sharing PKCS#11 modules
 License:        BSD
 URL:            http://p11-glue.freedesktop.org/p11-kit.html
 Source0:        http://p11-glue.freedesktop.org/releases/p11-kit-%{version}.tar.gz
-#Source1:        trust-extract-compat
+Source1:        trust-extract-compat
 Patch0:         0001-Remove-serial-tests-flag-to-fix-automake-1.11.patch
 BuildRequires:  libtasn1-devel >= 2.3
 BuildRequires:  nss-softokn-freebl
@@ -54,7 +54,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/modules
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/*.la
-#install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_libdir}/p11-kit/
+install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_libdir}/p11-kit/
 # Install the example conf with %%doc instead
 rm $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/pkcs11.conf.example
 
