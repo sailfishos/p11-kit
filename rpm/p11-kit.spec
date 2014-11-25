@@ -11,6 +11,7 @@ Patch0:         0001-Remove-serial-tests-flag-to-fix-automake-1.11.patch
 BuildRequires:  libtasn1-devel >= 2.3
 BuildRequires:  nss-softokn-freebl
 BuildRequires:  libffi-devel
+Requires:       p11-kit-nss-ckbi = %{version}-%{release}
 
 %description
 p11-kit provides a way to load and enumerate PKCS#11 modules, as well
@@ -30,13 +31,21 @@ developing applications that use %{name}.
 %package trust
 Summary:        System trust module from %{name}
 Requires:       %{name} = %{version}-%{release}
-#Requires(post):   %{_sbindir}/update-alternatives
-#Requires(postun): %{_sbindir}/update-alternatives
-Conflicts:        nss < 3.14.3-9
 
 %description trust
 The %{name}-trust package contains a system trust PKCS#11 module which
 contains certificate anchors and black lists.
+
+
+%package nss-ckbi
+Summary:        Replacement CA library for NSS
+Requires:       %{name}-trust = %{version}-%{release}
+Provides:       nss-ckbi
+Obsoletes:      nss-ckbi
+
+%description nss-ckbi
+This package replaces the nss-ckbi library with a compatible version that loads
+CA certificates from the p11-kit trust module.
 
 
 %prep
@@ -57,6 +66,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/*.la
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_libdir}/p11-kit/
 # Install the example conf with %%doc instead
 rm $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/pkcs11.conf.example
+ln -s %{_libdir}/pkcs11/p11-kit-trust.so $RPM_BUILD_ROOT%{_libdir}/libnssckbi.so
 
 %check
 make check
@@ -64,18 +74,7 @@ make check
 
 %post -p /sbin/ldconfig
 
-#%post trust
-#%{_sbindir}/update-alternatives --install %{_libdir}/libnssckbi.so \
-#%{alt_ckbi} %{_libdir}/pkcs11/p11-kit-trust.so 30
-
 %postun -p /sbin/ldconfig
-
-#%postun trust
-#if [ $1 -eq 0 ] ; then
-#        # package removal
-#        %{_sbindir}/update-alternatives --remove %{alt_ckbi} %{_libdir}/pkcs11/p11-kit-trust.so
-#fi
-
 
 %files
 %doc COPYING AUTHORS NEWS README
@@ -102,3 +101,5 @@ make check
 %{_datadir}/p11-kit/modules/p11-kit-trust.module
 %{_libdir}/p11-kit/trust-extract-compat
 
+%files nss-ckbi
+%{_libdir}/libnssckbi.so
