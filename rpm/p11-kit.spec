@@ -11,6 +11,8 @@ Patch0:         0001-Remove-serial-tests-flag-to-fix-automake-1.11.patch
 BuildRequires:  libtasn1-devel >= 2.3
 BuildRequires:  nss-softokn-freebl
 BuildRequires:  libffi-devel
+BuildRequires:  gettext-devel
+BuildRequires:  gettext-libs
 Requires:       p11-kit-nss-ckbi = %{version}-%{release}
 
 %description
@@ -53,9 +55,11 @@ CA certificates from the p11-kit trust module.
 %patch0 -p1
 
 %build
+export NOCONFIGURE=1
+%autogen
 # These paths are the source paths that  come from the plan here:
 # https://fedoraproject.org/wiki/Features/SharedSystemCertificates:SubTasks
-%reconfigure --disable-static --with-trust-paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source --with-hash-impl=freebl --disable-silent-rules
+%configure --disable-static --with-trust-paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source --with-hash-impl=freebl --disable-silent-rules
 make %{?_smp_mflags} V=1
 
 %install
