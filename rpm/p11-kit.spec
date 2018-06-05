@@ -1,5 +1,5 @@
 Name:           p11-kit
-Version:        0.22.1
+Version:        0.23.12
 Release:        1
 Summary:        Library for loading and sharing PKCS#11 modules
 
@@ -7,7 +7,6 @@ License:        BSD
 URL:            http://p11-glue.freedesktop.org/p11-kit.html
 Source0:        http://p11-glue.freedesktop.org/releases/p11-kit-%{version}.tar.gz
 Source1:        trust-extract-compat
-Patch0:         0001-Remove-serial-tests-flag-to-fix-automake-1.11.patch
 BuildRequires:  libtasn1-devel >= 2.3
 BuildRequires:  nss-softokn-freebl
 BuildRequires:  libffi-devel
@@ -39,6 +38,16 @@ The %{name}-trust package contains a system trust PKCS#11 module which
 contains certificate anchors and black lists.
 
 
+%package server
+Summary:        Server and client commands for %{name}
+Requires:       %{name} = %{version}-%{release}
+
+%description server
+The %{name}-server package contains command line tools that enable to
+export PKCS#11 modules through a Unix domain socket.  Note that this
+feature is still experimental.
+
+
 %package nss-ckbi
 Summary:        Replacement CA library for NSS
 Requires:       %{name}-trust = %{version}-%{release}
@@ -52,7 +61,6 @@ CA certificates from the p11-kit trust module.
 
 %prep
 %setup -q -n %{name}-%{version}/%{name}
-%patch0 -p1
 
 %build
 export NOCONFIGURE=1
@@ -67,7 +75,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/modules
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/*.la
-install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_libdir}/p11-kit/
+install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_libexecdir}/p11-kit/
 # Install the example conf with %%doc instead
 rm $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/pkcs11.conf.example
 ln -s %{_libdir}/pkcs11/p11-kit-trust.so $RPM_BUILD_ROOT%{_libdir}/libnssckbi.so
@@ -87,11 +95,11 @@ make check
 %dir %{_sysconfdir}/pkcs11/modules
 %dir %{_datadir}/p11-kit
 %dir %{_datadir}/p11-kit/modules
-%dir %{_libdir}/p11-kit
+%dir %{_libexecdir}/p11-kit
 %{_bindir}/p11-kit
 %{_libdir}/libp11-kit.so.*
 %{_libdir}/p11-kit-proxy.so
-%{_libdir}/p11-kit/p11-kit-remote
+%{_libexecdir}/p11-kit/p11-kit-remote
 
 %files devel
 %{_includedir}/p11-kit-1/
@@ -103,7 +111,11 @@ make check
 %dir %{_libdir}/pkcs11
 %{_libdir}/pkcs11/p11-kit-trust.so
 %{_datadir}/p11-kit/modules/p11-kit-trust.module
-%{_libdir}/p11-kit/trust-extract-compat
+%{_libexecdir}/p11-kit/trust-extract-compat
+
+%files server
+%{_libdir}/pkcs11/p11-kit-client.so
+%{_libexecdir}/p11-kit/p11-kit-server
 
 %files nss-ckbi
 %{_libdir}/libnssckbi.so
