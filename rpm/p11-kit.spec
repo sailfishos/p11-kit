@@ -89,8 +89,7 @@ make check
 %postun -p /sbin/ldconfig
 
 %files
-%doc COPYING AUTHORS NEWS README
-%doc p11-kit/pkcs11.conf.example
+%doc COPYING
 %dir %{_sysconfdir}/pkcs11
 %dir %{_sysconfdir}/pkcs11/modules
 %dir %{_datadir}/p11-kit
@@ -102,6 +101,8 @@ make check
 %{_libexecdir}/p11-kit/p11-kit-remote
 
 %files devel
+%doc AUTHORS NEWS README
+%doc p11-kit/pkcs11.conf.example
 %{_includedir}/p11-kit-1/
 %{_libdir}/libp11-kit.so
 %{_libdir}/pkgconfig/p11-kit-1.pc
