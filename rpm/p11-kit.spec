@@ -90,6 +90,7 @@ make check
 
 %files
 %doc COPYING
+%doc *.log
 %dir %{_sysconfdir}/pkcs11
 %dir %{_sysconfdir}/pkcs11/modules
 %dir %{_datadir}/p11-kit
