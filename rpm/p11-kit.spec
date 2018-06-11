@@ -81,7 +81,9 @@ rm $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/pkcs11.conf.example
 ln -s %{_libdir}/pkcs11/p11-kit-trust.so $RPM_BUILD_ROOT%{_libdir}/libnssckbi.so
 
 %check
+%ifnarch aarch64
 make check
+%endif
 
 
 %post -p /sbin/ldconfig
