@@ -8,10 +8,8 @@ URL:            http://p11-glue.freedesktop.org/p11-kit.html
 Source0:        http://p11-glue.freedesktop.org/releases/p11-kit-%{version}.tar.gz
 Source1:        trust-extract-compat
 BuildRequires:  libtasn1-devel >= 2.3
-BuildRequires:  nss-softokn-freebl
 BuildRequires:  libffi-devel
 BuildRequires:  gettext-devel
-BuildRequires:  gettext-libs
 Requires:       p11-kit-nss-ckbi = %{version}-%{release}
 
 %description
@@ -67,7 +65,7 @@ export NOCONFIGURE=1
 %autogen
 # These paths are the source paths that  come from the plan here:
 # https://fedoraproject.org/wiki/Features/SharedSystemCertificates:SubTasks
-%configure --disable-static --with-trust-paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source --with-hash-impl=freebl --disable-silent-rules
+%configure --disable-static --with-trust-paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source --with-hash-impl=internal --disable-silent-rules
 make %{?_smp_mflags} V=1
 
 %install
