@@ -1,13 +1,14 @@
 Name:           p11-kit
-Version:        0.23.12
+Version:        0.23.20
 Release:        1
 Summary:        Library for loading and sharing PKCS#11 modules
 
 License:        BSD
 URL:            http://p11-glue.freedesktop.org/p11-kit.html
-Source0:        http://p11-glue.freedesktop.org/releases/p11-kit-%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 Source1:        trust-extract-compat
 BuildRequires:  libtasn1-devel >= 2.3
+BuildRequires:  libtasn1-tools
 BuildRequires:  libffi-devel
 BuildRequires:  gettext-devel
 Requires:       p11-kit-nss-ckbi = %{version}-%{release}
@@ -45,7 +46,6 @@ The %{name}-server package contains command line tools that enable to
 export PKCS#11 modules through a Unix domain socket.  Note that this
 feature is still experimental.
 
-
 %package nss-ckbi
 Summary:        Replacement CA library for NSS
 Requires:       %{name}-trust = %{version}-%{release}
@@ -56,9 +56,8 @@ Obsoletes:      nss-ckbi
 This package replaces the nss-ckbi library with a compatible version that loads
 CA certificates from the p11-kit trust module.
 
-
 %prep
-%setup -q -n %{name}-%{version}/%{name}
+%autosetup -p1 -n %{name}-%{version}/%{name}
 
 %build
 export NOCONFIGURE=1
@@ -74,7 +73,6 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/modules
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/*.la
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_libexecdir}/p11-kit/
-# Install the example conf with %%doc instead
 rm $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/pkcs11.conf.example
 ln -s %{_libdir}/pkcs11/p11-kit-trust.so $RPM_BUILD_ROOT%{_libdir}/libnssckbi.so
 
@@ -83,13 +81,12 @@ ln -s %{_libdir}/pkcs11/p11-kit-trust.so $RPM_BUILD_ROOT%{_libdir}/libnssckbi.so
 make check
 %endif
 
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
 
 %files
-%doc COPYING
+%license COPYING
 %dir %{_sysconfdir}/pkcs11
 %dir %{_sysconfdir}/pkcs11/modules
 %dir %{_datadir}/p11-kit
@@ -102,7 +99,6 @@ make check
 
 %files devel
 %doc AUTHORS NEWS README
-%doc p11-kit/pkcs11.conf.example
 %{_includedir}/p11-kit-1/
 %{_libdir}/libp11-kit.so
 %{_libdir}/pkgconfig/p11-kit-1.pc
