@@ -2,7 +2,7 @@
 
 set -e
 
-if test "$UID" != "0"; then
+if test "$(id -u -r)" != "0"; then
 	echo "p11-kit: the 'extract-trust' command must be run as root" >&2
 	exit 2
 fi
