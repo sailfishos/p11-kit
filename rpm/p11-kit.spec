@@ -1,5 +1,5 @@
 Name:           p11-kit
-Version:        0.23.20
+Version:        0.23.22
 Release:        1
 Summary:        Library for loading and sharing PKCS#11 modules
 
@@ -50,7 +50,6 @@ feature is still experimental.
 Summary:        Replacement CA library for NSS
 Requires:       %{name}-trust = %{version}-%{release}
 Provides:       nss-ckbi
-Obsoletes:      nss-ckbi
 
 %description nss-ckbi
 This package replaces the nss-ckbi library with a compatible version that loads
@@ -64,17 +63,22 @@ export NOCONFIGURE=1
 %autogen
 # These paths are the source paths that  come from the plan here:
 # https://fedoraproject.org/wiki/Features/SharedSystemCertificates:SubTasks
-%configure --disable-static --with-trust-paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source --with-hash-impl=internal --disable-silent-rules
-make %{?_smp_mflags} V=1
+%configure \
+	--disable-static \
+	--with-trust-paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source \
+	--with-hash-impl=internal \
+	--disable-silent-rules \
+	--without-systemd
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install DESTDIR=$RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/modules
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/*.la
 install -p -m 755 %{SOURCE1} $RPM_BUILD_ROOT%{_libexecdir}/p11-kit/
 rm $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/pkcs11.conf.example
-ln -s %{_libdir}/pkcs11/p11-kit-trust.so $RPM_BUILD_ROOT%{_libdir}/libnssckbi.so
+ln -s pkcs11/p11-kit-trust.so $RPM_BUILD_ROOT%{_libdir}/libnssckbi.so
 
 %check
 %ifnarch aarch64
