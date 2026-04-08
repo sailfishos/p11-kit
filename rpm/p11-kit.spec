@@ -1,5 +1,5 @@
 Name:           p11-kit
-Version:        0.23.22
+Version:        0.26.2
 Release:        1
 Summary:        Library for loading and sharing PKCS#11 modules
 
@@ -10,7 +10,7 @@ Source1:        trust-extract-compat
 BuildRequires:  libtasn1-devel >= 2.3
 BuildRequires:  libtasn1-tools
 BuildRequires:  libffi-devel
-BuildRequires:  gettext-devel
+BuildRequires:  meson
 Requires:       p11-kit-nss-ckbi = %{version}-%{release}
 
 %description
@@ -59,20 +59,26 @@ CA certificates from the p11-kit trust module.
 %autosetup -p1 -n %{name}-%{version}/%{name}
 
 %build
-export NOCONFIGURE=1
-%autogen
 # These paths are the source paths that  come from the plan here:
 # https://fedoraproject.org/wiki/Features/SharedSystemCertificates:SubTasks
-%configure \
-	--disable-static \
-	--with-trust-paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source \
-	--with-hash-impl=internal \
-	--disable-silent-rules \
-	--without-systemd
-%make_build
+%meson \
+    -Dgtk_doc=false \
+    -Dman=false \
+    -Dtrust_paths=%{_sysconfdir}/pki/ca-trust/source:%{_datadir}/pki/ca-trust-source \
+    -Dhash_impl=internal \
+    -Dsystemd=disabled \
+    -Dbash_completion=disabled \
+    -Dzsh_completion=disabled \
+    -Dnls=false \
+%ifarch aarch64
+    -Dtest=false \
+%endif
+    %{nil}
 
+%meson_build
+	
 %install
-%make_install DESTDIR=$RPM_BUILD_ROOT
+%meson_install
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pkcs11/modules
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/*.la
@@ -82,7 +88,7 @@ ln -s pkcs11/p11-kit-trust.so $RPM_BUILD_ROOT%{_libdir}/libnssckbi.so
 
 %check
 %ifnarch aarch64
-make check
+meson check
 %endif
 
 %post -p /sbin/ldconfig
